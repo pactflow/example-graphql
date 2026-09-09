@@ -26,8 +26,8 @@ const schema = readFileSync(resolve(__dirname, '..', '..', 'schema', 'product.gr
 const productsApi = () =>
   graphql(
     new PactV4({
-      consumer: 'example-graphql-example-graphql-product-consumer',
-      provider: 'example-graphql-example-graphql-product-provider',
+      consumer: 'example-graphql-product-consumer',
+      provider: 'example-graphql-product-provider',
       dir: resolve(__dirname, '..', 'pacts'),
       logLevel: 'warn',
     }),
