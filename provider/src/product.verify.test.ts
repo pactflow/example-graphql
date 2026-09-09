@@ -62,8 +62,6 @@ describe('example-graphql-product-provider', () => {
     } else if (process.env.PACT_BROKER_BASE_URL) {
       options.pactBrokerUrl = process.env.PACT_BROKER_BASE_URL;
       options.pactBrokerToken = process.env.PACT_BROKER_TOKEN;
-      options.pactBrokerUsername = process.env.PACT_BROKER_USERNAME;
-      options.pactBrokerPassword = process.env.PACT_BROKER_PASSWORD;
 
       options.consumerVersionSelectors = [
         // What is on the consumer's main branch...
@@ -79,7 +77,7 @@ describe('example-graphql-product-provider', () => {
       // pacts are reported without failing it. Together they let consumers publish freely without
       // holding the provider's pipeline hostage.
       options.enablePending = true;
-      options.includeWipPactsSince = '2024-01-01';
+      options.includeWipPactsSince = '2026-06-01';
 
       // Only publish from CI. Results published from a developer's laptop pollute the broker with
       // verifications of code that was never pushed.
