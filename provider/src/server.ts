@@ -1,5 +1,5 @@
 /**
- * product-provider: an Apollo Server serving `schema/product.graphql`.
+ * example-graphql-product-provider: an Apollo Server serving `schema/product.graphql`.
  *
  * The same server is used by `npm run start:provider` and by provider verification — verification
  * against a server built differently from the one you ship proves nothing.

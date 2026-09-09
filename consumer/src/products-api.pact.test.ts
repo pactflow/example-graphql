@@ -1,5 +1,5 @@
 /**
- * Consumer contract tests for product-consumer → product-provider.
+ * Consumer contract tests for example-graphql-product-consumer → example-graphql-product-provider.
  *
  * Each test declares a GraphQL operation and the response shape the consumer needs, then runs the
  * *real* `ProductsApi` against the mock provider. The plugin validates the query, its variables
@@ -26,8 +26,8 @@ const schema = readFileSync(resolve(__dirname, '..', '..', 'schema', 'product.gr
 const productsApi = () =>
   graphql(
     new PactV4({
-      consumer: 'product-consumer',
-      provider: 'product-provider',
+      consumer: 'example-graphql-example-graphql-product-consumer',
+      provider: 'example-graphql-example-graphql-product-provider',
       dir: resolve(__dirname, '..', 'pacts'),
       logLevel: 'warn',
     }),

@@ -138,7 +138,7 @@ if (!command || !commands[command]) {
 }
 
 if (command !== 'publish' && !pacticipant) {
-  fail(`\`${command}\` needs a pacticipant name, e.g. product-consumer`);
+  fail(`\`${command}\` needs a pacticipant name, e.g. example-graphql-product-consumer`);
 }
 
 if (!version) {

@@ -2,7 +2,7 @@
   "name": "provider",
   "version": "1.0.0",
   "private": true,
-  "description": "product-provider: an Apollo GraphQL server for the Products API",
+  "description": "example-graphql-product-provider: an Apollo GraphQL server for the Products API",
   "license": "MIT",
   "type": "commonjs",
   "scripts": {

@@ -1,5 +1,5 @@
 /**
- * Provider verification for product-provider.
+ * Provider verification for example-graphql-product-provider.
  *
  * Replays every interaction in the consumer's contract against a real, running server. There are
  * no assertions written by hand here — the contract *is* the assertion.
@@ -32,7 +32,7 @@ function git(...args: string[]): string {
 const providerVersion = process.env.GIT_COMMIT || git('rev-parse', 'HEAD');
 const providerVersionBranch = process.env.GIT_BRANCH || git('rev-parse', '--abbrev-ref', 'HEAD');
 
-describe('product-provider', () => {
+describe('example-graphql-product-provider', () => {
   let server: Awaited<ReturnType<typeof startProviderServer>>;
 
   beforeAll(async () => {
@@ -45,7 +45,7 @@ describe('product-provider', () => {
 
   it('honours the contracts its consumers depend on', async () => {
     const options: VerifierOptions = {
-      provider: 'product-provider',
+      provider: 'example-graphql-product-provider',
       providerBaseUrl: server.url,
       providerVersion,
       providerVersionBranch,

@@ -10,8 +10,8 @@ so the plugin's schema-awareness has something to work with.
 
 | | |
 |---|---|
-| **Consumer** | `product-consumer` — a TypeScript GraphQL client |
-| **Provider** | `product-provider` — an Apollo Server serving the same SDL |
+| **Consumer** | `example-graphql-product-consumer` — a TypeScript GraphQL client |
+| **Provider** | `example-graphql-product-provider` — an Apollo Server serving the same SDL |
 | **Test runner** | [Vitest] |
 | **Broker** | [PactFlow] (or any Pact Broker) |
 
@@ -115,8 +115,8 @@ Every lifecycle stage has one. There is no Makefile.
 | `npm run test:consumer` | consumer contract tests → `consumer/pacts/` |
 | `npm run test:provider` | provider verification |
 | `npm run publish:pacts` | publish contracts, tagged with commit + branch |
-| `npm run can-i-deploy:consumer` | release gate for `product-consumer` |
-| `npm run can-i-deploy:provider` | release gate for `product-provider` |
+| `npm run can-i-deploy:consumer` | release gate for `example-graphql-product-consumer` |
+| `npm run can-i-deploy:provider` | release gate for `example-graphql-product-provider` |
 | `npm run deploy:consumer` | (simulated) deploy, then `record-deployment` |
 | `npm run deploy:provider` | (simulated) deploy, then `record-deployment` |
 | `npm run record-deployment:*` | record a deployment without deploying |
