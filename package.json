@@ -1,0 +1,45 @@
+{
+  "name": "pactflow-example-graphql",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Example GraphQL consumer and provider using Pact and the GraphQL plugin",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pactflow/example-graphql.git"
+  },
+  "workspaces": [
+    "consumer",
+    "provider"
+  ],
+  "scripts": {
+    "typecheck": "npm run typecheck --workspaces",
+
+    "test": "npm run test:consumer && npm run test:provider",
+    "test:consumer": "npm run test --workspace consumer",
+    "test:provider": "npm run test --workspace provider",
+
+    "start:provider": "npm run start --workspace provider",
+
+    "publish:pacts": "node scripts/pact.mjs publish",
+
+    "can-i-deploy:consumer": "node scripts/pact.mjs can-i-deploy product-consumer",
+    "can-i-deploy:provider": "node scripts/pact.mjs can-i-deploy product-provider",
+
+    "deploy:consumer": "node scripts/pact.mjs deploy product-consumer",
+    "deploy:provider": "node scripts/pact.mjs deploy product-provider",
+
+    "record-deployment:consumer": "node scripts/pact.mjs record-deployment product-consumer",
+    "record-deployment:provider": "node scripts/pact.mjs record-deployment product-provider",
+
+    "ci": "npm run typecheck && npm run test:consumer && npm run publish:pacts && npm run test:provider",
+    "clean": "rm -rf consumer/pacts consumer/logs provider/logs"
+  },
+  "devDependencies": {
+    "@pact-foundation/pact-cli": "^18.1.1",
+    "typescript": "^5.9.3"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

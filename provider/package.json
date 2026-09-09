@@ -1,0 +1,30 @@
+{
+  "name": "provider",
+  "version": "1.0.0",
+  "private": true,
+  "description": "product-provider: an Apollo GraphQL server for the Products API",
+  "license": "MIT",
+  "type": "commonjs",
+  "scripts": {
+    "start": "ts-node src/start.ts",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@apollo/server": "^5.5.1",
+    "@as-integrations/express5": "^1.1.2",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "graphql": "^16.11.0"
+  },
+  "devDependencies": {
+    "@pact-foundation/pact": "^17.1.4",
+    "@pact-foundation/pact-graphql-plugin": "^0.4.0",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.10.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.18"
+  }
+}

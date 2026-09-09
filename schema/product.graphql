@@ -1,0 +1,93 @@
+# The Products API, shared by the consumer and the provider.
+#
+# The consumer validates every query, its variables and the expected response against this SDL
+# at pact-write time; the provider builds its server from it. One file, one source of truth.
+
+schema {
+  query: Query
+  mutation: Mutation
+}
+
+"Lifecycle state of a product. Enums become a `match: regex` rule over the enum's values."
+enum ProductStatus {
+  ACTIVE
+  DRAFT
+  OUT_OF_STOCK
+  ARCHIVED
+}
+
+enum CurrencyCode {
+  USD
+  EUR
+  GBP
+  AUD
+}
+
+type Money {
+  amount: Float!
+  currency: CurrencyCode!
+}
+
+type Price {
+  "List price. Always present."
+  list: Money!
+  "Sale price, when the product is discounted. Nullable on purpose."
+  sale: Money
+}
+
+type Inventory {
+  quantity: Int!
+  updatedAt: String!
+}
+
+type Category {
+  id: ID!
+  name: String!
+  slug: String!
+}
+
+type Variant {
+  id: ID!
+  sku: String!
+  name: String!
+  price: Price!
+  inventory: Inventory!
+}
+
+type Product {
+  id: ID!
+  "Canonical Products-example field, kept so this reads like the other pactflow examples."
+  type: String!
+  name: String!
+  sku: String!
+  description: String
+  status: ProductStatus!
+  category: Category
+  tags: [String!]!
+  variants: [Variant!]!
+}
+
+type CartLine {
+  id: ID!
+  product: Product!
+  variant: Variant!
+  quantity: Int!
+  lineTotal: Money!
+}
+
+"Input object type. Variables are validated against it before the pact is written."
+input AddToCartInput {
+  productId: ID!
+  variantId: ID!
+  quantity: Int!
+}
+
+type Query {
+  "Returns null when no product has that id."
+  product(id: ID!): Product
+  products(status: ProductStatus, first: Int): [Product!]!
+}
+
+type Mutation {
+  addToCart(input: AddToCartInput!): CartLine!
+}

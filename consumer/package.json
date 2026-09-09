@@ -1,0 +1,19 @@
+{
+  "name": "consumer",
+  "version": "1.0.0",
+  "private": true,
+  "description": "product-consumer: a GraphQL client for the Products API",
+  "license": "MIT",
+  "type": "commonjs",
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@pact-foundation/pact": "^17.1.4",
+    "@pact-foundation/pact-graphql-plugin": "^0.4.0",
+    "@types/node": "^22.10.2",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.18"
+  }
+}

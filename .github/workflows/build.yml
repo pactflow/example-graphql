@@ -1,0 +1,144 @@
+# The full contract-testing lifecycle, in the order it has to happen:
+#
+#   consumer tests → publish contract → provider verification → can-i-deploy → deploy
+#
+# The consumer job runs first and gates the provider job. That ordering is not cosmetic: the
+# provider verifies contracts the consumer publishes, so a provider run that starts first either
+# verifies a stale contract or nothing at all.
+
+name: Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+  # PactFlow's "contract requiring verification published" webhook fires this, so a consumer
+  # change triggers provider verification without waiting for the provider's next commit.
+  repository_dispatch:
+    types: [contract-requiring-verification-published]
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PACT_BROKER_BASE_URL: ${{ secrets.PACT_BROKER_BASE_URL }}
+  PACT_BROKER_TOKEN: ${{ secrets.PACT_BROKER_TOKEN }}
+  PACT_ENVIRONMENT: production
+  PACT_DO_NOT_TRACK: 'true'
+  # Every stage must agree on the application version, or can-i-deploy answers a question about a
+  # version nobody published. `github.head_ref` is the real branch on a pull_request event, where
+  # `github.ref_name` is the synthetic "N/merge".
+  GIT_COMMIT: ${{ github.event.client_payload.sha || github.sha }}
+  GIT_BRANCH: ${{ github.head_ref || github.ref_name }}
+
+jobs:
+  consumer:
+    name: Consumer tests & publish contract
+    runs-on: ubuntu-latest
+    # A webhook-triggered run is verifying an already-published contract; re-running the consumer
+    # would republish it under the provider's commit.
+    if: github.event_name != 'repository_dispatch'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      # Installs the GraphQL plugin binary into ~/.pact/plugins as a postinstall of
+      # @pact-foundation/pact-graphql-plugin — no separate plugin step needed.
+      - run: npm ci
+
+      - run: npm run typecheck
+
+      - name: Run consumer contract tests
+        run: npm run test:consumer
+
+      - name: Publish contract to PactFlow
+        if: env.PACT_BROKER_BASE_URL != ''
+        run: npm run publish:pacts
+
+      # Kept so a failed verification can be diagnosed from the run that produced the contract.
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pacts
+          path: consumer/pacts/
+          if-no-files-found: warn
+
+  provider:
+    name: Provider verification
+    runs-on: ubuntu-latest
+    # `always()` so this still runs on the webhook path, where `consumer` is skipped entirely.
+    needs: [consumer]
+    if: always() && needs.consumer.result != 'failure' && needs.consumer.result != 'cancelled'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm run typecheck
+
+      # Fetches the consumer's contracts from PactFlow (or, with no broker configured, verifies
+      # the pacts on disk) and publishes the results back under this provider version.
+      - name: Verify consumer contracts
+        env:
+          CI: 'true'
+          # Set only on the webhook path: verify exactly the contract that changed.
+          PACT_URL: ${{ github.event.client_payload.pact_url }}
+        run: |
+          if [ -z "$PACT_BROKER_BASE_URL" ]; then
+            echo "No broker configured — regenerating contracts locally to verify against."
+            npm run test:consumer
+          fi
+          npm run test:provider
+
+  deploy-consumer:
+    name: Deploy consumer
+    runs-on: ubuntu-latest
+    needs: [consumer, provider]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+
+      # The release gate. Fails the build if this consumer version has not been verified against
+      # what is currently in production.
+      - name: can-i-deploy
+        run: npm run can-i-deploy:consumer
+
+      # Only reached if the gate passed. Records the deployment so the *next* can-i-deploy — the
+      # provider's — knows what the consumer in production expects.
+      - name: Deploy and record
+        run: npm run deploy:consumer
+
+  deploy-provider:
+    name: Deploy provider
+    runs-on: ubuntu-latest
+    needs: [consumer, provider]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+
+      - name: can-i-deploy
+        run: npm run can-i-deploy:provider
+
+      - name: Deploy and record
+        run: npm run deploy:provider

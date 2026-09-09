@@ -1,0 +1,13 @@
+node_modules/
+dist/
+
+# Generated contracts. Committed pacts go stale; the broker is the source of truth.
+consumer/pacts/
+consumer/.tmp-pacts/
+
+# Pact and Apollo logs
+logs/
+*.log
+
+.env
+.DS_Store
